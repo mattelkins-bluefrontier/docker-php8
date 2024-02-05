@@ -17,3 +17,4 @@ ENV APACHE_LOG_DIR=${WWW_ROOT}/logs/apache
 WORKDIR ${WWW_ROOT}
 
 COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
+COPY ./httpd-vhosts.conf /usr/local/apache2/conf/extra/httpd-vhosts.conf

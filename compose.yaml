@@ -1,4 +1,4 @@
-version: "3.7"
+version: "0.1"
 
 networks:
   docker.network:
@@ -13,7 +13,7 @@ services:
     networks:
       - docker.network
     volumes:
-      - \\wsl$\Ubuntu\home\matt\www:/var/www
+      - ${PATH_WEBROOT}:/var/www
 
   apache:
     build: ./docker/apache
@@ -28,7 +28,7 @@ services:
     networks:
       - docker.network
     volumes:
-      - \\wsl$\Ubuntu\home\matt\www:/var/www
+      - ${PATH_WEBROOT}:/var/www
 
   mariadb:
     image: mariadb
@@ -41,7 +41,7 @@ services:
       - docker.network
     volumes:
       - ./docker/mysql/mariadb.cnf:/etc/mysql/conf.d/custom.cnf:ro
-      - \\wsl$\Ubuntu\home\matt\www\dbdata:/var/lib/mysql
+      - ${PATH_DBROOT}:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_USER: ${MYSQL_USER:-mysql}

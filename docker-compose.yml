@@ -13,7 +13,7 @@ services:
     networks:
       - docker.network
     volumes:
-      - .:/var/www
+      - \\wsl$\Ubuntu\home\matt\www:/var/www
 
   apache:
     build: ./docker/apache
@@ -28,7 +28,7 @@ services:
     networks:
       - docker.network
     volumes:
-      - .:/var/www
+      - \\wsl$\Ubuntu\home\matt\www:/var/www
 
   mariadb:
     image: mariadb

@@ -41,7 +41,7 @@ services:
       - docker.network
     volumes:
       - ./docker/mysql/mariadb.cnf:/etc/mysql/conf.d/custom.cnf:ro
-      - ./docker/mysql/dbdata:/var/lib/mysql
+      - \\wsl$\Ubuntu\home\matt\www\dbdata:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_USER: ${MYSQL_USER:-mysql}

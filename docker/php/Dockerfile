@@ -1,9 +1,5 @@
 # From
-FROM php:8.2.12-fpm-alpine3.18
-
-# Labels
-LABEL creatorName="Vagner dos Santos Cardoso"
-LABEL creatorEmail="vagnercardosoweb@gmail.com"
+FROM php:8.2.15-fpm-alpine3.19
 
 # Set timezone
 ENV TZ=${TZ:-UTC}
@@ -30,8 +26,6 @@ RUN set -eux \
   && docker-php-ext-install \
   mysqli \
   pdo_mysql \
-  pdo_pgsql \
-  pgsql\
   bcmath \
   mbstring \
   xml \
@@ -51,25 +45,9 @@ RUN set -eux \
   gmp \
   \
   # Install xdebug
-  && pecl install -o -f xdebug \
-  && docker-php-ext-enable xdebug \
-  \
-  # Install redis
-  && pecl install -o -f redis \
-  && docker-php-ext-enable redis \
-  \
-  # Install mongodb
-  && pecl install -o -f mongodb \
-  && docker-php-ext-enable mongodb \
-  \
-  # Install apcu
-  && pecl install -o -f apcu \
-  && docker-php-ext-enable apcu \
-  \
-  # Install ssh2 \
-  && pecl install -o -f ssh2 \
-  && docker-php-ext-enable ssh2 \
-  \
+  #&& pecl install -o -f xdebug \
+  #&& docker-php-ext-enable xdebug \
+  #\
   # Clean php extensions
   && rm -rf /tmp/pear \
   && docker-php-source delete \
@@ -89,9 +67,12 @@ COPY ./entrypoint /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
 # Workdir
-ENV WORKDIR=/var/www/app
-RUN mkdir -p ${WORKDIR}
+ENV WORKDIR=/var/www
 WORKDIR ${WORKDIR}
+
+# Logs
+RUN mkdir -p ${WORKDIR}/logs/php
+ENV PHP_LOG_DIR=${WORKDIR}/logs/php
 
 # Expose port
 EXPOSE 9000

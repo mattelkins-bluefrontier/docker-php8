@@ -1,20 +1,51 @@
-# Docker with PHP 8.2.12
+# Docker with PHP 8.2.15
 
-This repository aims to facilitate the creation of a development environment with php 8.2.12.
+This repository aims to facilitate the creation of a PHP development environment.
 
 ## What's in the environment:
 
-- [Nginx](https://www.nginx.com/)
-- [Php Fpm](https://php.net/)
+- [PHP-FPM](https://php.net/)
+  - [php](https://hub.docker.com/_/php):[8.2.15-fpm-alpine3.19](https://hub.docker.com/layers/library/php/8.2.15-fpm-alpine3.19/images/sha256-b15e71c6d9e549d4b69d4200a6f9d49386c5ae617c38e27fc79dc146dc7fd407)
 - [Apache2](https://httpd.apache.org/)
-- [MySQL](https://www.mysql.com/)
+  - [httpd](https://hub.docker.com/_/httpd):[2.4-alpine](https://hub.docker.com/layers/library/httpd/2.4-alpine/images/sha256-faaa3c93157a9c34ac00190b859e7a22975cbc6dd79f357609db03e17f0db178)
 - [MariaDB](https://mariadb.com/)
-- [PhpMyAdmin](https://www.phpmyadmin.net/)
-- [PgAdmin](https://www.pgadmin.org/)
-- [PostgreSQL](https://www.postgresql.org/)
-- [Redis](https://redis.io/)
+  - [mariadb](https://hub.docker.com/_/mariadb):[latest](https://hub.docker.com/layers/library/mariadb/latest/images/sha256-ac933f87a5fc8b743a3c522179116ee63aec31105795dc28dea8b80bb74cdd36)
+- [phpMyAdmin](https://www.phpmyadmin.net/)
+  - [phpmyadmin](https://hub.docker.com/_/phpmyadmin):[latest](https://hub.docker.com/layers/library/phpmyadmin/latest/images/sha256-25c6b614d3190d1993a2b55a8af77d4dab67983e9ef51fde5227bd9289b99f95)
 
 ## Prerequisites:
+
+### Windows users:
+
+- [Enable hardware virtualisation in the BIOS](https://www.virtualmetric.com/blog/how-to-enable-hardware-virtualization)
+- [Install the Windows Subsytem for Linux (a.k.a. WSL 2)](https://learn.microsoft.com/en-us/windows/wsl/install)
+  - The default Linux distro is Ubuntu. Make sure you [set up your Linux user info](https://learn.microsoft.com/en-us/windows/wsl/install#set-up-your-linux-user-info).
+  - You should also [check WSL version 2 is running](https://learn.microsoft.com/en-us/windows/wsl/install#check-which-version-of-wsl-you-are-running), which it should be unless your computer is ancient.
+- [Enable Windows features](https://docs.docker.com/desktop/troubleshoot/topics/#virtualization):
+  - Virtual Machine Platform
+    - ***NB:** If this feature is already enabled, you may need to disable it, restart Windows, re-enable it, and restart Windows again. This is a Windows bug apparently.*
+  - Windows Subsystem for Linux
+    - *This feature should already be enabled after completing the step above.*
+  - Hyper-V
+  - Windows Hypervisor Platform
+    - *The two features above aren't used (using WSL 2 is the recommended option), but still need to be enabled for some reason.*
+- [Install the WSL extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) for Visual Studio Code
+  - [Install Visual Studio Code](https://code.visualstudio.com/Download) first if needed.
+- Create a folder in your Linux home directory to use as the "root" for this container, and set up a few required folders, by running the following commands in Command Prompt:
+  - `wsl`
+  - `cd ~`
+  - `mkdir www; mkdir www/dbdata; mkdir -p www/logs/apache; mkdir -p www/logs/php; mkdir www/public_html`
+  - `touch www/public_html/index.php`
+- Add `phpinfo();` or something in to `public_html/index.php` - this will be used to check everything is behaving. To open in Visual Studio Code, run the following commands:
+  - `cd ~/www/public_html`
+  - `code .`
+- **NB:** Having code living inside, and running from, the Linux file system provided by WSL 2 has significant performance advantages. The alternative is to have code running from the Windows file system via a Linux mount, which is prohibitively slow.
+
+### Docker:
+
+- [Install Docker Desktop](https://www.docker.com/products/docker-desktop/) (recommended)
+
+*OR*
 
 - [Install Docker](https://docs.docker.com/install/)
 - [Install Docker Compose](https://docs.docker.com/compose/install/)
@@ -23,148 +54,42 @@ This repository aims to facilitate the creation of a development environment wit
 
 - Clone the repository
 - Enter the repository folder
-- Run the `docker-compose up` command
-  - if you want to run in background mode, run the command `docker-compose up -d`
-- Access the address `http://localhost:8080` to access phpmyadmin
-  - user access
-    - user: mysql
-    - password: mysql
-    - host: mysql
-  - root access
-    - user: root
-    - password: root
-    - host: mysql
-- Access the address `http://localhost:8081` to access pgadmin
-  - user: admin@localhost.com
-  - password: admin
-- Access the address `http://localhost` to access the project
+- Create a `.env` file at the same level as `compose.yaml` and add the following variables:
+  - `PATH_ROOT` - the folder in your Linux home directory within WSL 2 to map to `/var/www`, e.g. `\\wsl$\Ubuntu\home\YOUR_LINUX_USERNAME\www`, and which will act as the "root" for the container
+  - `PATH_WEBROOT` - the folder within `PATH_ROOT` from which web pages will be served, e.g. `${PATH_ROOT}\public_html` which will be interpreted as `\\wsl$\Ubuntu\home\YOUR_LINUX_USERNAME\www\public_html`
+  - `PATH_DBROOT` - the folder within `PATH_ROOT` which will store database data, e.g. `${PATH_ROOT}\dbdata` which will be interpreted as `\\wsl$\Ubuntu\home\YOUR_LINUX_USERNAME\www\dbdata`
+- Run the command `docker-compose up -d`
+- The address `http://localhost:8080` will load phpMyAdmin
+  - User access:
+    - User: mysql
+    - Password: mysql
+    - Host: mariadb
+  - Root access:
+    - User: root
+    - Password: root
+    - Host: mariadb
+- The address `http://localhost` will load `public_html/index.php`
 
-## Persistent data:
+## php.ini configuration:
 
-- mysql data: `./docker/mysql/dbdata`
-- postgresql data: `./docker/postgresql/dbdata`
-- redis data: `./docker/redis`
+Local php.ini configuration is located in the `./docker/php/php.ini` file. After making changes, you will need to run `docker-compose up -d --build` to copy the updated file in to the correct location within the container.
 
-## PHP INI Config:
+## Apache named virtual hosts
 
-Local php.ini configuration is located in the `./docker/php/php.ini` file.
+By default, a single application can be run out of `PATH_WEBROOT`, but it's also possible to leverage virtual hosts in Apache to run multiple applications using the same versions of PHP and MariaDB, e.g.:
 
-```ini
-[PHP]
-log_errors=On
-xmlrpc_errors=On
-html_errors=On
-display_errors=On
-display_startup_errors=On
-report_memleaks=On
-error_reporting=E_ALL
-file_uploads=On
-max_execution_time=120
-max_input_time=120
-session.gc_maxlifetime=1440
-post_max_size=50M
-upload_max_filesize=45M
-max_file_uploads=20
-variables_order="EGPCS"
-max_input_vars=10000
-max_input_nesting_level=64
-date.timezone=UTC
-memory_limit=512M
-expose_php=On
-
-[opcache]
-opcache.enable=true
-opcache.enable_cli=true
-opcache.jit=tracing
-
-[intl]
-intl.default_locale=en_utf8
-
-[xdebug]
-xdebug.client_host=host.docker.internal
-xdebug.client_port=9003
-xdebug.discover_client_host=0
-xdebug.start_with_request=yes
-xdebug.remote_handler=dbgp
-xdebug.idekey=PHPSTORM
-xdebug.mode=debug,develop
-xdebug.cli_color=1
-```
-
-## PHP Modules:
-
-```
-[PHP Modules]
-  apcu
-  bcmath
-  Core
-  ctype
-  curl
-  date
-  dom
-  exif
-  fileinfo
-  filter
-  ftp
-  gd
-  gmp
-  hash
-  iconv
-  imap
-  intl
-  json
-  libxml
-  mbstring
-  mongodb
-  mysqli
-  mysqlnd
-  openssl
-  pcntl
-  pcre
-  PDO
-  pdo_mysql
-  pdo_pgsql
-  pdo_sqlite
-  pgsql
-  Phar
-  posix
-  random
-  readline
-  redis
-  Reflection
-  session
-  SimpleXML
-  soap
-  sockets
-  sodium
-  SPL
-  sqlite3
-  ssh2
-  standard
-  sysvmsg
-  sysvsem
-  sysvshm
-  tokenizer
-  xdebug
-  xml
-  xmlreader
-  xmlwriter
-  xsl
-  Zend OPcache
-  zip
-  zlib
-
-[Zend Modules]
-  Xdebug
-  Zend OPcache
-```
-
-## Comments:
-
-The project starts the services of `nginx`, `php`, `mysql`, `postgresql`, `phpmyadmin`, `pgadmin`
-and `redis` by default, if you want to use `apache2`, `mariadb` you need to comment the services
-that are being used and enable the services you want to use on the
-`docker-compose.yml` file.
+`
+|_ PATH_ROOT
+   |_ my_joomla_site
+      |_ index.php
+      |_ etc.
+   |_ my_wp_site
+      |_ index.php
+      |_ etc.
+   |_ my_drupal_site
+      |_ index.php
+      |_ etc.
+`
 
 ## License:
 

@@ -54,7 +54,7 @@ This repository aims to facilitate the creation of a PHP development environment
 
 - Clone the repository
 - Enter the repository folder
-- Create a `.env` file at the same level as `compose.yaml` and add the following variables:
+- Create a `.env` file at the same level as `compose.yaml` and add the following environment variables:
   - `PATH_ROOT` - the folder in your Linux home directory within WSL 2 to map to `/var/www`, e.g. `\\wsl$\Ubuntu\home\YOUR_LINUX_USERNAME\www`, and which will act as the "root" for the container
   - `PATH_WEBROOT` - the folder within `PATH_ROOT` from which web pages will be served, e.g. `${PATH_ROOT}\public_html` which will be interpreted as `\\wsl$\Ubuntu\home\YOUR_LINUX_USERNAME\www\public_html`
   - `PATH_DBROOT` - the folder within `PATH_ROOT` which will store database data, e.g. `${PATH_ROOT}\dbdata` which will be interpreted as `\\wsl$\Ubuntu\home\YOUR_LINUX_USERNAME\www\dbdata`
@@ -83,12 +83,54 @@ By default, a single application can be run out of `PATH_WEBROOT`, but it's also
    |_ my_joomla_site
       |_ index.php
       |_ etc.
+
    |_ my_wp_site
       |_ index.php
       |_ etc.
+
    |_ my_drupal_site
       |_ index.php
       |_ etc.
+
+   |_ index.php
+```
+
+Named virtual can be created by adding an `httpd-vhosts.conf` file to `docker/apache`, and adding `<VirtualHost>` entries as required, e.g.:
+
+```
+<VirtualHost *:80>
+  DocumentRoot "${WWW_ROOT}/public_html/my_joomla_site"
+  ServerName my_joomla_site.local
+  <Directory "${WWW_ROOT}/public_html/my_joomla_site">
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+  DocumentRoot "${WWW_ROOT}/public_html/my_wp_site"
+  ServerName my_wp_site.local
+  <Directory "${WWW_ROOT}/public_html/my_wp_site">
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+  DocumentRoot "${WWW_ROOT}/public_html/my_drupal_site"
+  ServerName my_drupal_site.local
+  <Directory "${WWW_ROOT}/public_html/my_drupal_site">
+    AllowOverride All
+  </Directory>
+</VirtualHost>
+```
+
+*NB:* Note the use of the variable `${WWW_ROOT}` which will be interpreted as `/var/www`, which, in turn, will reference the folder path specified by the `PATH_ROOT` environment variable.
+
+Continuing with the examples above, the following would need adding to your `hosts` file:
+
+```
+127.0.0.1   my_joomla_site.local
+127.0.0.1   my_wp_site.local
+127.0.0.1   my_drupal_site.local
 ```
 
 ## License:

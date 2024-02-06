@@ -13,7 +13,7 @@ services:
     networks:
       - docker.network
     volumes:
-      - ${PATH_WEBROOT}:/var/www
+      - ${PATH_ROOT}:/var/www
 
   apache:
     build: ./docker/apache
@@ -28,7 +28,7 @@ services:
     networks:
       - docker.network
     volumes:
-      - ${PATH_WEBROOT}:/var/www
+      - ${PATH_ROOT}:/var/www
 
   mariadb:
     image: mariadb

@@ -78,7 +78,7 @@ Local php.ini configuration is located in the `./docker/php/php.ini` file. After
 
 By default, a single application can be run out of `PATH_WEBROOT`, but it's also possible to leverage virtual hosts in Apache to run multiple applications using the same versions of PHP and MariaDB, e.g.:
 
-`
+```
 |_ PATH_ROOT
    |_ my_joomla_site
       |_ index.php
@@ -89,7 +89,7 @@ By default, a single application can be run out of `PATH_WEBROOT`, but it's also
    |_ my_drupal_site
       |_ index.php
       |_ etc.
-`
+```
 
 ## License:
 

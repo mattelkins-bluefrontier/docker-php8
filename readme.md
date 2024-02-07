@@ -18,9 +18,11 @@ This repository aims to facilitate the creation of a PHP development environment
 ### Windows users:
 
 - [Enable hardware virtualisation in the BIOS](https://www.virtualmetric.com/blog/how-to-enable-hardware-virtualization)
+
 - [Install the Windows Subsytem for Linux (a.k.a. WSL 2)](https://learn.microsoft.com/en-us/windows/wsl/install)
   - The default Linux distro is Ubuntu. Make sure you [set up your Linux user info](https://learn.microsoft.com/en-us/windows/wsl/install#set-up-your-linux-user-info).
   - You should also [check WSL version 2 is running](https://learn.microsoft.com/en-us/windows/wsl/install#check-which-version-of-wsl-you-are-running), which it should be unless your computer is ancient.
+
 - [Enable Windows features](https://docs.docker.com/desktop/troubleshoot/topics/#virtualization):
   - Virtual Machine Platform
     - ***NB:** If this feature is already enabled, you may need to disable it, restart Windows, re-enable it, and restart Windows again. This is a Windows bug apparently.*
@@ -29,16 +31,33 @@ This repository aims to facilitate the creation of a PHP development environment
   - Hyper-V
   - Windows Hypervisor Platform
     - *The two features above aren't used (using WSL 2 is the recommended option), but still need to be enabled for some reason.*
+
 - [Install the WSL extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) for Visual Studio Code
   - [Install Visual Studio Code](https://code.visualstudio.com/Download) first if needed.
+
 - Create a folder in your Linux home directory to use as the "root" for this container, and set up a few required folders, by running the following commands in Command Prompt:
   - `wsl`
   - `cd ~`
   - `mkdir www; mkdir www/dbdata; mkdir -p www/logs/apache; mkdir -p www/logs/php; mkdir www/public_html`
   - `touch www/public_html/index.php`
+
 - Add `phpinfo();` or something in to `public_html/index.php` - this will be used to check everything is behaving. To open in Visual Studio Code, run the following commands:
   - `cd ~/www/public_html`
   - `code .`
+
+- Set permissions to allow Apache to run the website and also allow code to be edited.
+  - The `www-data` user in [Alpine Linux](https://www.alpinelinux.org/) (the distro used in the container) has an ID of 82, which is not the same as the equivalent `www-data` user in the default distro ([Ubuntu](https://ubuntu.com/)) installed in WSL. Run the following command to change the user and group IDs in Ubuntu to match Alpine:
+    - `sudo usermod -u 82 www-data`
+    - `sudo groupmod -g 82 www-data`
+  - To ensure you still have the ability to edit code, add your Linux user to the `www-data` group:
+    - `sudo usermod -a -G www-data your_linux_username`
+  - Change ownership of folders the `www-data` user and group will need to access:
+    - `cd ~/www`
+    - `sudo chown -R www-data:www-data logs`
+    - `sudo chown -R www-data:www-data public_html`
+  - Give the `www-data` group (to which your Linux user is now a member) write access to everything inside `public_html`:
+    - `sudo chmod -R g+w public_html`
+
 - **NB:** Having code living inside, and running from, the Linux file system provided by WSL 2 has significant performance advantages. The alternative is to have code running from the Windows file system via a Linux mount, which is prohibitively slow.
 
 ### Docker:

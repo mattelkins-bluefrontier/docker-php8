@@ -144,12 +144,15 @@ Named virtual can be created by adding an `httpd-vhosts.conf` file to `docker/ap
 
 *NB:* Note the use of the variable `${WWW_ROOT}` which will be interpreted as `/var/www`, which, in turn, will reference the folder path specified by the `PATH_ROOT` environment variable.
 
-Continuing with the examples above, the following would need adding to your `hosts` file:
+Continuing with the examples above, the following would need adding to your `hosts` file (**NB:** both IPv4 and IPv6 addresses might be required!):
 
 ```
 127.0.0.1   my_joomla_site.local
+::1         my_joomla_site.local
 127.0.0.1   my_wp_site.local
+::1         my_wp_site.local
 127.0.0.1   my_drupal_site.local
+::1         my_drupal_site.local
 ```
 
 ## License:

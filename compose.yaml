@@ -10,6 +10,8 @@ services:
     restart: unless-stopped
     container_name: docker.php
     tty: true
+    depends_on:
+      - apache
     networks:
       - docker.network
     volumes:
@@ -20,8 +22,6 @@ services:
     restart: unless-stopped
     container_name: docker.apache
     tty: true
-    depends_on:
-      - php
     ports:
       - 80:80
       - 443:443
@@ -47,11 +47,29 @@ services:
       MYSQL_USER: ${MYSQL_USER:-mysql}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
 
+  #mysql:
+  #  image: mysql
+  #  restart: unless-stopped
+  #  container_name: docker.mysql
+  #  tty: true
+  #  ports:
+  #    - '3306:3306'
+  #  networks:
+  #    - docker.network
+  #  volumes:
+  #    - ./docker/mysql/mysql.cnf:/etc/mysql/conf.d/custom.cnf:ro
+  #    - ${PATH_DBROOT}:/var/lib/mysql
+  #  environment:
+  #    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+  #    MYSQL_USER: ${MYSQL_USER:-mysql}
+  #    MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
+
   phpmyadmin:
     image: phpmyadmin
     container_name: docker.phpmyadmin
     tty: true
     depends_on:
+      - php
       - mariadb
     ports:
       - "8080:80"

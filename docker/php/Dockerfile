@@ -1,5 +1,6 @@
 # From
 FROM php:8.2.15-fpm-alpine3.19
+ENV PHP_VERSION=8.2.15
 
 # Set timezone
 ENV TZ=${TZ:-UTC}
@@ -59,7 +60,7 @@ RUN set -eux \
 # Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-# Copy php settings
+# Copy PHP settings
 COPY ./php.ini ${PHP_INI_DIR}/conf.d/99-php.ini
 
 # Copy entrypoint
@@ -71,8 +72,10 @@ ENV WORKDIR=/var/www
 WORKDIR ${WORKDIR}
 
 # Logs
-RUN mkdir -p ${WORKDIR}/logs/php
-ENV PHP_LOG_DIR=${WORKDIR}/logs/php
+ENV PHP_LOG_DIR=${WORKDIR}/logs/php-${PHP_VERSION}
+
+# Tmp
+ENV PHP_TMP_DIR=${WORKDIR}/tmp/php-${PHP_VERSION}
 
 # Expose port
 EXPOSE 9000

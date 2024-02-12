@@ -31,7 +31,7 @@ services:
       - ${PATH_ROOT}:/var/www
 
   mariadb:
-    image: mariadb
+    build: ./docker/mariadb
     restart: unless-stopped
     container_name: docker.mariadb
     tty: true
@@ -40,15 +40,10 @@ services:
     networks:
       - docker.network
     volumes:
-      - ./docker/mysql/mariadb.cnf:/etc/mysql/conf.d/custom.cnf:ro
       - ${PATH_DBROOT}:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-      MYSQL_USER: ${MYSQL_USER:-mysql}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
 
   #mysql:
-  #  image: mysql
+  #  build: ./docker/mysql
   #  restart: unless-stopped
   #  container_name: docker.mysql
   #  tty: true
@@ -57,12 +52,7 @@ services:
   #  networks:
   #    - docker.network
   #  volumes:
-  #    - ./docker/mysql/mysql.cnf:/etc/mysql/conf.d/custom.cnf:ro
   #    - ${PATH_DBROOT}:/var/lib/mysql
-  #  environment:
-  #    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-  #    MYSQL_USER: ${MYSQL_USER:-mysql}
-  #    MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
 
   phpmyadmin:
     image: phpmyadmin

@@ -35,6 +35,8 @@ services:
     restart: unless-stopped
     container_name: docker.mariadb
     tty: true
+    depends_on:
+      - apache
     ports:
       - '3306:3306'
     networks:
@@ -47,6 +49,8 @@ services:
   #  restart: unless-stopped
   #  container_name: docker.mysql
   #  tty: true
+  #  depends_on:
+  #    - apache
   #  ports:
   #    - '3306:3306'
   #  networks:
@@ -69,3 +73,17 @@ services:
       PMA_HOST: mariadb
       PMA_ARBITRARY: 1
       PMA_PORT: 3306
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: docker.mailpit
+    tty: true
+    depends_on:
+      - apache
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    environment:
+      MP_QUIET: 1
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1

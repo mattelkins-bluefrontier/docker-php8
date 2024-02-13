@@ -12,6 +12,7 @@ services:
     tty: true
     depends_on:
       - apache
+      - mailpit
     networks:
       - docker.network
     volumes:
@@ -38,7 +39,7 @@ services:
     depends_on:
       - apache
     ports:
-      - '3306:3306'
+      - 3306:3306
     networks:
       - docker.network
     volumes:
@@ -52,7 +53,7 @@ services:
   #  depends_on:
   #    - apache
   #  ports:
-  #    - '3306:3306'
+  #    - 3306:3306
   #  networks:
   #    - docker.network
   #  volumes:
@@ -66,7 +67,7 @@ services:
       - php
       - mariadb
     ports:
-      - "8080:80"
+      - 8080:80
     networks:
       - docker.network
     environment:
@@ -81,8 +82,8 @@ services:
     depends_on:
       - apache
     ports:
-      - "8025:8025"
-      - "1025:1025"
+      - 8025:8025
+      - 1025:1025
     environment:
       MP_QUIET: 1
       MP_SMTP_AUTH_ACCEPT_ANY: 1

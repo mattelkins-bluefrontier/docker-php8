@@ -12,6 +12,7 @@ services:
     tty: true
     depends_on:
       - apache
+      - mailpit
     networks:
       - docker.network
     volumes:
@@ -31,38 +32,32 @@ services:
       - ${PATH_ROOT}:/var/www
 
   mariadb:
-    image: mariadb
+    build: ./docker/mariadb
     restart: unless-stopped
     container_name: docker.mariadb
     tty: true
+    depends_on:
+      - apache
     ports:
-      - '3306:3306'
+      - 3306:3306
     networks:
       - docker.network
     volumes:
-      - ./docker/mysql/mariadb.cnf:/etc/mysql/conf.d/custom.cnf:ro
       - ${PATH_DBROOT}:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-      MYSQL_USER: ${MYSQL_USER:-mysql}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
 
   #mysql:
-  #  image: mysql
+  #  build: ./docker/mysql
   #  restart: unless-stopped
   #  container_name: docker.mysql
   #  tty: true
+  #  depends_on:
+  #    - apache
   #  ports:
-  #    - '3306:3306'
+  #    - 3306:3306
   #  networks:
   #    - docker.network
   #  volumes:
-  #    - ./docker/mysql/mysql.cnf:/etc/mysql/conf.d/custom.cnf:ro
   #    - ${PATH_DBROOT}:/var/lib/mysql
-  #  environment:
-  #    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-  #    MYSQL_USER: ${MYSQL_USER:-mysql}
-  #    MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
 
   phpmyadmin:
     image: phpmyadmin
@@ -72,10 +67,24 @@ services:
       - php
       - mariadb
     ports:
-      - "8080:80"
+      - 8080:80
     networks:
       - docker.network
     environment:
       PMA_HOST: mariadb
       PMA_ARBITRARY: 1
       PMA_PORT: 3306
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: docker.mailpit
+    tty: true
+    depends_on:
+      - apache
+    ports:
+      - 8025:8025
+      - 1025:1025
+    environment:
+      MP_QUIET: 1
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1

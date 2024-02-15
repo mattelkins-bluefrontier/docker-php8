@@ -1,6 +1,6 @@
 # From
-FROM php:8.2.15-fpm-alpine3.19
-ENV PHP_VERSION=8.2.15
+FROM php:fpm-alpine3.19
+ENV PHP_VERSION=latest
 
 # Set timezone
 ENV TZ=${TZ:-UTC}
@@ -63,10 +63,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 # Copy PHP settings
 COPY ./php.ini ${PHP_INI_DIR}/conf.d/99-php.ini
 
-# Copy entrypoint
-COPY ./entrypoint /usr/local/bin/docker-entrypoint
-RUN chmod +x /usr/local/bin/docker-entrypoint
-
 # Workdir
 ENV WORKDIR=/var/www
 WORKDIR ${WORKDIR}
@@ -80,5 +76,5 @@ ENV PHP_TMP_DIR=${WORKDIR}/tmp/php-${PHP_VERSION}
 # Expose port
 EXPOSE 9000
 
-# Run entrypoint
-CMD ["docker-entrypoint"]
+# Entrypoint
+ENTRYPOINT ["php-fpm"]

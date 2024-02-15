@@ -1,15 +1,17 @@
-# Docker with PHP 8.2.15
+# Docker with PHP 8.3.x (Latest)
 
 This repository aims to facilitate the creation of a PHP development environment.
 
 ## What's in the environment:
 
 - [PHP-FPM](https://php.net/)
-  - [php](https://hub.docker.com/_/php):[8.2.15-fpm-alpine3.19](https://hub.docker.com/layers/library/php/8.2.15-fpm-alpine3.19/images/sha256-b15e71c6d9e549d4b69d4200a6f9d49386c5ae617c38e27fc79dc146dc7fd407)
+  - [php](https://hub.docker.com/_/php):[fpm-alpine3.19](https://hub.docker.com/layers/library/php/fpm-alpine3.19/images/sha256-13644664abd18d3c06de89702aa02df13a82c4c1ddff8b06434180baa1fc0b61)
 - [Apache2](https://httpd.apache.org/)
   - [httpd](https://hub.docker.com/_/httpd):[2.4-alpine](https://hub.docker.com/layers/library/httpd/2.4-alpine/images/sha256-faaa3c93157a9c34ac00190b859e7a22975cbc6dd79f357609db03e17f0db178)
 - [MariaDB](https://mariadb.com/)
   - [mariadb](https://hub.docker.com/_/mariadb):[latest](https://hub.docker.com/layers/library/mariadb/latest/images/sha256-ac933f87a5fc8b743a3c522179116ee63aec31105795dc28dea8b80bb74cdd36)
+- [MySQL](https://www.mysql.com/)
+  - [mysql](https://hub.docker.com/_/mysql):[latest](https://hub.docker.com/layers/library/mysql/latest/images/sha256-b5777db44c3714c323e47ea272a6611149ba5c9d9910235ac8056b9a4f8222a7)
 - [phpMyAdmin](https://www.phpmyadmin.net/)
   - [phpmyadmin](https://hub.docker.com/_/phpmyadmin):[latest](https://hub.docker.com/layers/library/phpmyadmin/latest/images/sha256-25c6b614d3190d1993a2b55a8af77d4dab67983e9ef51fde5227bd9289b99f95)
 

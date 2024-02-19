@@ -77,6 +77,7 @@ services:
 
   mailpit:
     image: axllent/mailpit
+    # container_name = SMTP host!
     container_name: docker.mailpit
     tty: true
     depends_on:
@@ -84,6 +85,8 @@ services:
     ports:
       - 8025:8025
       - 1025:1025
+    networks:
+      - docker.network
     environment:
       MP_QUIET: 1
       MP_SMTP_AUTH_ACCEPT_ANY: 1

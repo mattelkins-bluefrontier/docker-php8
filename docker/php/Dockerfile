@@ -23,7 +23,7 @@ RUN set -eux \
   libssh2-dev gmp-dev libzip-dev libxml2-dev freetds-dev \
   $PHPIZE_DEPS \
   \
-  # Php extensions
+  # PHP extensions
   && docker-php-ext-install \
   mysqli \
   pdo_mysql \
@@ -46,10 +46,10 @@ RUN set -eux \
   gmp \
   \
   # Install xdebug
-  #&& pecl install -o -f xdebug \
-  #&& docker-php-ext-enable xdebug \
-  #\
-  # Clean php extensions
+  && pecl install -o -f xdebug \
+  && docker-php-ext-enable xdebug \
+  \
+  # Clean PHP extensions
   && rm -rf /tmp/pear \
   && docker-php-source delete \
   \

@@ -17,6 +17,8 @@ services:
       - docker.network
     volumes:
       - ${PATH_ROOT}:/var/www
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   apache:
     build: ./docker/apache

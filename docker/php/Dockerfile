@@ -63,15 +63,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 # Copy PHP settings
 COPY ./php.ini ${PHP_INI_DIR}/conf.d/99-php.ini
 
-# Workdir
-ENV WORKDIR=/var/www
-WORKDIR ${WORKDIR}
-
 # Logs
-ENV PHP_LOG_DIR=${WORKDIR}/logs/php-${PHP_VERSION}
+ENV LOG_DIR=/var/log/php
 
 # Tmp
-ENV PHP_TMP_DIR=${WORKDIR}/tmp/php-${PHP_VERSION}
+RUN mkdir -p /var/tmp/php
+RUN chown -R www-data:www-data /var/tmp/php
+ENV TMP_DIR=/var/tmp/php
 
 # Expose port
 EXPOSE 9000

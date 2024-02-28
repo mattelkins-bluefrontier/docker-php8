@@ -1,4 +1,4 @@
-version: "1.1.0"
+version: "1.2.0"
 
 networks:
   docker.network:
@@ -16,7 +16,12 @@ services:
     networks:
       - docker.network
     volumes:
-      - ${PATH_ROOT}:/var/www
+      - ${PATH_SITE}:/var/www/public_html
+      - ${PATH_LOGS_PHP}:/var/log/php
+    environment:
+      HOST: ${HOST}
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   apache:
     build: ./docker/apache
@@ -29,7 +34,10 @@ services:
     networks:
       - docker.network
     volumes:
-      - ${PATH_ROOT}:/var/www
+      - ${PATH_SITE}:/var/www/public_html
+      - ${PATH_LOGS_APACHE}:/var/log/apache
+    environment:
+      SERVER_NAME: ${HOST}
 
   mariadb:
     build: ./docker/mariadb
@@ -44,6 +52,12 @@ services:
       - docker.network
     volumes:
       - ${PATH_DBROOT}:/var/lib/mysql
+      - ${PATH_LOGS_MARIADB}:/var/log/mariadb
+    environment:
+      HOST: ${HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_USER: ${MYSQL_USER:-mysql}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
 
   #mysql:
   #  build: ./docker/mysql
@@ -58,6 +72,12 @@ services:
   #    - docker.network
   #  volumes:
   #    - ${PATH_DBROOT}:/var/lib/mysql
+  #    - ${PATH_LOGS_MYSQL}:/var/log/mysql
+  #  environment:
+  #    HOST: ${HOST}
+  #    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+  #    MYSQL_USER: ${MYSQL_USER:-mysql}
+  #    MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
 
   phpmyadmin:
     image: phpmyadmin
@@ -77,6 +97,7 @@ services:
 
   mailpit:
     image: axllent/mailpit
+    # container_name = SMTP host!
     container_name: docker.mailpit
     tty: true
     depends_on:
@@ -84,7 +105,8 @@ services:
     ports:
       - 8025:8025
       - 1025:1025
+    networks:
+      - docker.network
     environment:
-      MP_QUIET: 1
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1

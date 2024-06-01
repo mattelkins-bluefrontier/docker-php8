@@ -37,10 +37,10 @@ services:
     environment:
       SERVER_NAME: ${HOST}
 
-  mariadb:
-    build: ./docker/mariadb
+  database:
+    build: ./docker/${SERVICE_DB}
     restart: unless-stopped
-    container_name: docker.mariadb
+    container_name: docker.${SERVICE_DB}
     tty: true
     depends_on:
       - apache
@@ -50,32 +50,10 @@ services:
       - docker.network
     volumes:
       - ${PATH_DBROOT}:/var/lib/mysql
-      - ${PATH_LOGS_MARIADB}:/var/log/mariadb
+      - ${PATH_LOGS_DB}:/var/log/${SERVICE_DB}
     environment:
       HOST: ${HOST}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-      MYSQL_USER: ${MYSQL_USER:-mysql}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
-
-  #mysql:
-  #  build: ./docker/mysql
-  #  restart: unless-stopped
-  #  container_name: docker.mysql
-  #  tty: true
-  #  depends_on:
-  #    - apache
-  #  ports:
-  #    - 3306:3306
-  #  networks:
-  #    - docker.network
-  #  volumes:
-  #    - ${PATH_DBROOT}:/var/lib/mysql
-  #    - ${PATH_LOGS_MYSQL}:/var/log/mysql
-  #  environment:
-  #    HOST: ${HOST}
-  #    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
-  #    MYSQL_USER: ${MYSQL_USER:-mysql}
-  #    MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
+      MYSQL_ROOT_PASSWORD: ${SERVICE_DB_ROOT_PASSWORD:-root}
 
   phpmyadmin:
     image: phpmyadmin
@@ -83,13 +61,13 @@ services:
     tty: true
     depends_on:
       - php
-      - mariadb
+      - database
     ports:
       - 8080:80
     networks:
       - docker.network
     environment:
-      PMA_HOST: mariadb
+      PMA_HOST: database
       PMA_ARBITRARY: 1
       PMA_PORT: 3306
 

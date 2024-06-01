@@ -14,7 +14,7 @@ services:
     networks:
       - docker.network
     volumes:
-      - ${PATH_SITE}:/var/www/public_html
+      - ${PATH_SITE}:/var/www/html
       - ${PATH_LOGS_PHP}:/var/log/php
     environment:
       HOST: ${HOST}
@@ -32,7 +32,7 @@ services:
     networks:
       - docker.network
     volumes:
-      - ${PATH_SITE}:/var/www/public_html
+      - ${PATH_SITE}:/var/www/html
       - ${PATH_LOGS_APACHE}:/var/log/apache
     environment:
       SERVER_NAME: ${HOST}

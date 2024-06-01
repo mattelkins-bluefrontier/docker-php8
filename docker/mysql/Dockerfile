@@ -1,6 +1,8 @@
+# Args
+ARG TAG=latest
+
 # From
-FROM mysql
-ENV MYSQL_VERSION=latest
+FROM mysql:${TAG}
 
 # Copy configuration
 COPY ./mysql.cnf /etc/mysql/conf.d/custom.cnf:ro

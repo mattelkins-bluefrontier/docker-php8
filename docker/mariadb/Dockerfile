@@ -1,6 +1,8 @@
+# Args
+ARG TAG=latest
+
 # From
-FROM mariadb
-ENV MARIADB_VERSION=latest
+FROM mariadb:${TAG}
 
 # Copy configuration
 COPY ./mariadb.cnf /etc/mysql/conf.d/custom.cnf:ro

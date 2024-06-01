@@ -9,7 +9,7 @@ net_buffer_length=8K
 read_buffer_size=256K
 read_rnd_buffer_size=512K
 myisam_sort_buffer_size=8M
-log_error="${LOG_DIR}/${HOST}.${MARIADB_VERSION}.mariadb_error.log"
+log_error="${LOG_DIR}/${HOST}.${DB_VERSION}.mariadb_error.log"
 
 innodb_buffer_pool_size=16M
 innodb_log_file_size=5M

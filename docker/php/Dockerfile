@@ -1,6 +1,9 @@
+# ARG
+ARG TAG=latest
+
 # From
-FROM php:fpm-alpine3.19
-ENV PHP_VERSION=latest
+FROM php:${TAG}
+ENV PHP_VERSION=${VERSION}
 
 # Set timezone
 ENV TZ=${TZ:-UTC}

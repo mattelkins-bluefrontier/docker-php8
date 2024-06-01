@@ -4,7 +4,10 @@ networks:
 
 services:
   php:
-    build: ./docker/php
+    build:
+      context: ./docker/php
+      args:
+        TAG: ${SERVICE_PHP_TAG}
     restart: unless-stopped
     container_name: docker.php
     tty: true
@@ -18,11 +21,15 @@ services:
       - ${PATH_LOGS_PHP}:/var/log/php
     environment:
       HOST: ${HOST}
+      PHP_VERSION: ${SERVICE_PHP_VERSION}
     extra_hosts:
       - host.docker.internal:host-gateway
 
   apache:
-    build: ./docker/apache
+    build:
+      context: ./docker/apache
+      args:
+        TAG: ${SERVICE_APACHE_TAG}
     restart: unless-stopped
     container_name: docker.apache
     tty: true
@@ -38,7 +45,10 @@ services:
       SERVER_NAME: ${HOST}
 
   database:
-    build: ./docker/${SERVICE_DB}
+    build:
+      context: ./docker/${SERVICE_DB}
+      args:
+        TAG: ${SERVICE_DB_TAG}
     restart: unless-stopped
     container_name: docker.${SERVICE_DB}
     tty: true
@@ -53,6 +63,7 @@ services:
       - ${PATH_LOGS_DB}:/var/log/${SERVICE_DB}
     environment:
       HOST: ${HOST}
+      DB_VERSION: ${SERVICE_DB_VERSION}
       MYSQL_ROOT_PASSWORD: ${SERVICE_DB_ROOT_PASSWORD:-root}
 
   phpmyadmin:

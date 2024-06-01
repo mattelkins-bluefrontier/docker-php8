@@ -43,22 +43,27 @@ This repository aims to facilitate the creation of a PHP development environment
   - `mkdir www; mkdir www/dbdata; mkdir -p www/logs/apache; mkdir -p www/logs/php; mkdir www/public_html`
   - `touch www/public_html/index.php`
 
-- Add `phpinfo();` or something in to `public_html/index.php` - this will be used to check everything is behaving. To open in Visual Studio Code, run the following commands:
-  - `cd ~/www/public_html`
-  - `code .`
-
 - Set permissions to allow Apache to run the website and also allow code to be edited.
   - The `www-data` user in [Alpine Linux](https://www.alpinelinux.org/) (the distro used in the container) has an ID of 82, which is not the same as the equivalent `www-data` user in the default distro ([Ubuntu](https://ubuntu.com/)) installed in WSL. Run the following command to change the user and group IDs in Ubuntu to match Alpine:
     - `sudo usermod -u 82 www-data`
     - `sudo groupmod -g 82 www-data`
   - To ensure you still have the ability to edit code, add your Linux user to the `www-data` group:
-    - `sudo usermod -a -G www-data your_linux_username`
+    - `sudo usermod -aG www-data your_linux_username`
   - Change ownership of folders the `www-data` user and group will need to access:
     - `cd ~/www`
     - `sudo chown -R www-data:www-data logs`
     - `sudo chown -R www-data:www-data public_html`
   - Give the `www-data` group (to which your Linux user is now a member) write access to everything inside `public_html`:
     - `sudo chmod -R g+w public_html`
+
+- Optionally create a group and user for Docker's database user in WSL. This doesn't actually do anything other that make it easier to identify folders/files which are owned by the database user.
+  - Create a user and group with ID 999 which *should* match the ID Docker will use for the database user:
+    - `sudo groupadd -g 999 docker-db`
+    - `sudo useradd -u 999 -g 999 docker-db`
+
+- Add `phpinfo();` or something in to `public_html/index.php` - this will be used to check everything is behaving. To open in Visual Studio Code, run the following commands:
+  - `cd ~/www/public_html`
+  - `code .`
 
 - **NB:** Having code living inside, and running from, the Linux file system provided by WSL 2 has significant performance advantages. The alternative is to have code running from the Windows file system via a Linux mount, which is prohibitively slow.
 
@@ -77,18 +82,14 @@ This repository aims to facilitate the creation of a PHP development environment
 - Enter the repository folder
 - Create a `.env` file at the same level as `compose.yaml` and add the following environment variables:
   - `PATH_ROOT` - the folder in your Linux home directory within WSL 2 to map to `/var/www`, e.g. `\\wsl$\Ubuntu\home\YOUR_LINUX_USERNAME\www`, and which will act as the "root" for the container
-  - `PATH_WEBROOT` - the folder within `PATH_ROOT` from which web pages will be served, e.g. `${PATH_ROOT}\public_html` which will be interpreted as `\\wsl$\Ubuntu\home\YOUR_LINUX_USERNAME\www\public_html`
+  - `PATH_SITE` - the folder within `PATH_ROOT` from which web pages will be served, e.g. `${PATH_ROOT}\public_html` which will be interpreted as `\\wsl$\Ubuntu\home\YOUR_LINUX_USERNAME\www\public_html`
   - `PATH_DBROOT` - the folder within `PATH_ROOT` which will store database data, e.g. `${PATH_ROOT}\dbdata` which will be interpreted as `\\wsl$\Ubuntu\home\YOUR_LINUX_USERNAME\www\dbdata`
 - Run the command `docker-compose up -d`
 - The address `http://localhost:8080` will load phpMyAdmin
-  - User access:
-    - User: mysql
-    - Password: mysql
-    - Host: mariadb
   - Root access:
     - User: root
     - Password: root
-    - Host: mariadb
+    - Host: database
 - The address `http://localhost` will load `public_html/index.php`
 
 ## php.ini configuration:
@@ -97,23 +98,24 @@ Local php.ini configuration is located in the `./docker/php/php.ini` file. After
 
 ## Apache named virtual hosts
 
-By default, a single application can be run out of `PATH_WEBROOT`, but it's also possible to leverage virtual hosts in Apache to run multiple applications using the same versions of PHP and MariaDB, e.g.:
+By default, a single application can be run out of `PATH_SITE`, but it's also possible to leverage virtual hosts in Apache to run multiple applications using the same versions of PHP and MariaDB, e.g.:
 
 ```
 |_ PATH_ROOT
-   |_ my_joomla_site
-      |_ index.php
-      |_ etc.
+  |_ PATH_SITE
+    |_ my_joomla_site
+        |_ index.php
+        |_ etc.
 
-   |_ my_wp_site
-      |_ index.php
-      |_ etc.
+    |_ my_wp_site
+        |_ index.php
+        |_ etc.
 
-   |_ my_drupal_site
-      |_ index.php
-      |_ etc.
+    |_ my_drupal_site
+        |_ index.php
+        |_ etc.
 
-   |_ index.php
+    |_ index.php
 ```
 
 Named virtual can be created by adding an `httpd-vhosts.conf` file to `docker/apache`, and adding `<VirtualHost>` entries as required, e.g.:

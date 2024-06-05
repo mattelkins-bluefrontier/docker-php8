@@ -55,9 +55,15 @@ This repository aims to facilitate the creation of a PHP development environment
     - `sudo chown -R www-data:www-data public_html`
   - Give the `www-data` group (to which your Linux user is now a member) write access to everything inside `public_html`:
     - `sudo chmod -R g+w public_html`
-  - Set up an ACL for `public_html` to ensure permissions are inherited correctly.
+  - Set up ACLs for `public_html` to ensure permissions are inherited correctly.
     - To install ACL if required: `sudo apt install acl`
-    - `sudo setfacl -Rdm g:www-data:rwx public_html`
+    - `cd ~/www`
+    - `sudo find public_html -type d -exec setfacl -m d:u:www-data:rwx {} \;`
+    - `sudo find public_html -type d -exec setfacl -m d:g:www-data:rwx {} \;`
+    - `sudo find public_html -type d -exec setfacl -m u:www-data:rwx {} \;`
+    - `sudo find public_html -type d -exec setfacl -m g:www-data:rwx {} \;`
+    - `sudo find public_html -type f -exec setfacl -m u:www-data:rw {} \;`
+    - `sudo find public_html -type f -exec setfacl -m g:www-data:rw {} \;`
 
 - Optionally create a group and user for Docker's database user in WSL. This doesn't actually do anything other that make it easier to identify folders/files which are owned by the database user.
   - Create a user and group with ID 999 which *should* match the ID Docker will use for the database user:

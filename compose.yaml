@@ -1,0 +1,99 @@
+networks:
+  docker.network:
+    driver: bridge
+
+services:
+  php:
+    build:
+      context: ./docker/php
+      args:
+        TAG: ${SERVICE_PHP_TAG}
+    restart: unless-stopped
+    container_name: docker.php
+    tty: true
+    depends_on:
+      - apache
+      - mailpit
+    networks:
+      - docker.network
+    volumes:
+      - ${PATH_SITE}:/var/www/html
+      - ${PATH_LOGS_PHP}:/var/log/php
+    environment:
+      HOST: ${HOST}
+      PHP_VERSION: ${SERVICE_PHP_VERSION}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  apache:
+    build:
+      context: ./docker/apache
+      args:
+        TAG: ${SERVICE_APACHE_TAG}
+    restart: unless-stopped
+    container_name: docker.apache
+    tty: true
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - docker.network
+    volumes:
+      - ${PATH_SITE}:/var/www/html
+      - ${PATH_LOGS_APACHE}:/var/log/apache
+    environment:
+      SERVER_NAME: ${HOST}
+
+  database:
+    build:
+      context: ./docker/${SERVICE_DB}
+      args:
+        TAG: ${SERVICE_DB_TAG}
+    restart: unless-stopped
+    container_name: docker.${SERVICE_DB}
+    tty: true
+    depends_on:
+      - apache
+    ports:
+      - 3306:3306
+    networks:
+      - docker.network
+    volumes:
+      - ${PATH_DBROOT}:/var/lib/mysql
+      - ${PATH_LOGS_DB}:/var/log/${SERVICE_DB}
+    environment:
+      HOST: ${HOST}
+      DB_VERSION: ${SERVICE_DB_VERSION}
+      MYSQL_ROOT_PASSWORD: ${SERVICE_DB_ROOT_PASSWORD:-root}
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: docker.phpmyadmin
+    tty: true
+    depends_on:
+      - php
+      - database
+    ports:
+      - 8080:80
+    networks:
+      - docker.network
+    environment:
+      PMA_HOST: database
+      PMA_ARBITRARY: 1
+      PMA_PORT: 3306
+
+  mailpit:
+    image: axllent/mailpit
+    # container_name = SMTP host!
+    container_name: docker.mailpit
+    tty: true
+    depends_on:
+      - apache
+    ports:
+      - 8025:8025
+      - 1025:1025
+    networks:
+      - docker.network
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
